@@ -1,7 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 
 import { UploaderService } from '../../services/uploader.service';
-import { catchError } from 'rxjs';
 
 @Component({
   selector: 'uploader-upload-field',
@@ -12,7 +11,7 @@ export class UploadFieldComponent {
   @ViewChild('fileUploadInput', { static: false })
   public fileUploadInput!: ElementRef<HTMLInputElement>;
 
-  public file?: File;
+  public file: File | null = null;
 
   constructor(
     private uploaderService: UploaderService,
@@ -20,6 +19,13 @@ export class UploadFieldComponent {
 
   public onDragImage(event: DragEvent) {
     event.preventDefault();
+  }
+
+  private uploadImage(file: File) {
+    this.uploaderService.uploadImage(file)
+    .subscribe(resp => {
+      console.log(resp);
+    });
   }
 
   public onDropImage(event: DragEvent) {
@@ -32,10 +38,7 @@ export class UploadFieldComponent {
         this.fileUploadInput.nativeElement.files = files;
         this.file = files[0];
 
-        this.uploaderService.uploadImage(this.file)
-          .subscribe(resp => {
-            console.log(resp);
-          });
+        this.uploadImage(this.file);
       };
     };
   }
@@ -45,6 +48,8 @@ export class UploadFieldComponent {
 
     if (event.target.files) {
       this.file = event.target.files[0];
+
+      this.uploadImage(this.file!);
     }
 
     console.log(this.file);
