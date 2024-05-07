@@ -23,6 +23,5 @@ export class UploaderService {
     this.isLoading = false;
 
     return this.http.post<Image>(url, formData);
-
   }
 }
